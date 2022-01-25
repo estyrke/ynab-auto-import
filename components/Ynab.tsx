@@ -38,7 +38,7 @@ const YnabBudgetList = (props: YnabBudgetListProps) => {
     return props.onBudgetSelected(e.currentTarget.value);
   }}>
     <option>--- Select a budget ---</option>
-    {props.budgets?.data.budgets.map((b) => <option value={b.id}>{b.name}</option>)}
+    {props.budgets?.data.budgets.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
   </Select>
 }
 
@@ -54,7 +54,7 @@ const YnabAccountList = (props: YnabAccountListProps) => {
     return props.onAccountSelected(e.currentTarget.value);
   }}>
     <option value="x">--- Select an account ---</option>
-    {props.accounts?.data.accounts.map((a) => <option value={a.id}>{a.name}</option>)}
+    {props.accounts?.data.accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
   </Select>
 }
 

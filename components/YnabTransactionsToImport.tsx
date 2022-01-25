@@ -32,7 +32,7 @@ export const YnabTransactionsToImport = ({ transactions, budgetId, accountId }: 
 
   return <>
     <Table>
-      {transactions.map((t) => <Tr><Td>{t.date}</Td><Td>{t.payee_name}</Td><Td>{t.memo}</Td><Td>{t.amount}</Td></Tr>)}
+      {transactions.map((t) => <Tr key={t.import_id}><Td>{t.date}</Td><Td>{t.payee_name}</Td><Td>{t.memo}</Td><Td>{t.amount}</Td></Tr>)}
     </Table>
     <Button disabled={isLoading || !budgetId || !accountId} onClick={doImport}>{isLoading ? "Importing..." : "Import"}</Button>
   </>;

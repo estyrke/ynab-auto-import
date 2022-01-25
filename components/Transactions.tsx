@@ -9,7 +9,7 @@ const Amount = ({ amount }: { amount: Amount }) => <Text>{amount.amount} {amount
 const TransactionLine = ({ transaction, keys }: { transaction: any; keys: string[] }) => {
 
   return <Tr>
-    {keys.map(k => <Td>{typeof (transaction[k]) == "string" ? transaction[k] : JSON.stringify(transaction[k])}</Td>)}</Tr>
+    {keys.map(k => <Td key={k}>{typeof (transaction[k]) == "string" ? transaction[k] : JSON.stringify(transaction[k])}</Td>)}</Tr>
 }
 
 export type TransactionsProps = {
@@ -19,7 +19,6 @@ export type TransactionsProps = {
 
 export const Transactions = ({ accountId, onSelectTransactions }: TransactionsProps) => {
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string>("")
   const [isLoading, setLoading] = useState(false)
 
@@ -66,11 +65,11 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
   return <>
     <Table size="sm" fontSize="xx-small">
       <Thead>Booked</Thead>
-      {transactionData?.booked.map(t => <Tr><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      {transactionData?.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
     </Table>
     <Table>
       <Thead>Pending</Thead>
-      {transactionData?.pending.map(t => <Tr><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      {transactionData?.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
     </Table>
     <Formik
       initialValues={{}}
@@ -93,12 +92,12 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
 
   return <>
     <Table size="sm" fontSize="xx-small">
-      <Thead>{bKeys.map(t => <Th>{t}</Th>)}</Thead>
-      {transactionData?.booked.map(t => <TransactionLine transaction={t} keys={bKeys} />)}
+      <Thead>{bKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
+      {transactionData?.booked.map(t => <TransactionLine key={t.transactionId} transaction={t} keys={bKeys} />)}
     </Table>
     <Table>
-      <Thead>{pKeys.map(t => <Th>{t}</Th>)}</Thead>
-      {transactionData?.pending.map(t => <TransactionLine transaction={t} keys={pKeys} />)}
+      <Thead>{pKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
+      {transactionData?.pending.map((t, i) => <TransactionLine key={i} transaction={t} keys={pKeys} />)}
     </Table>
   </>
 }

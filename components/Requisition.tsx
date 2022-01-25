@@ -1,6 +1,5 @@
-import { Box, Button, propNames, SimpleGrid } from "@chakra-ui/react";
+import { Box, Button, SimpleGrid } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import { json } from "stream/consumers";
 import { RequisitionData } from "../lib/nordigen";
 
 
@@ -22,7 +21,7 @@ type UnlinkButtonProps = {
   onUnlink: () => void;
 };
 
-const UnlinkButton = (props: UnlinkButtonProps) => {
+const UnlinkButton = ({ onUnlink }: UnlinkButtonProps) => {
   const unlinkAccount = useCallback(() => {
     fetch('api/unlink')
       .then(async (res) => {
@@ -30,9 +29,9 @@ const UnlinkButton = (props: UnlinkButtonProps) => {
       })
       .then((data) => {
         console.log("Bank unlinked successfully");
-        props.onUnlink();
+        onUnlink();
       }).catch(console.log)
-  }, [])
+  }, [onUnlink])
   return <Button onClick={unlinkAccount}>Remove bank link</Button>
 }
 
@@ -49,7 +48,7 @@ type RequisitionProps = {
   onAccountsChanged: (accountIds: string[]) => void;
 };
 
-export const Requisition = (props: RequisitionProps) => {
+export const Requisition = ({ onAccountsChanged, onInstitutionChanged }: RequisitionProps) => {
   const [requisition, setRequisition] = useState<RequisitionData | null>(null);
   const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setLoading] = useState(false)
@@ -68,7 +67,7 @@ export const Requisition = (props: RequisitionProps) => {
         if (data.accounts != accounts) {
           setAccounts(data.accounts);
 
-          props.onAccountsChanged(data.accounts);
+          onAccountsChanged(data.accounts);
         }
         setError("");
         setLoading(false);
@@ -77,16 +76,16 @@ export const Requisition = (props: RequisitionProps) => {
         setRequisition(null);
         if ([] != accounts) {
           setAccounts([]);
-          props.onAccountsChanged([]);
+          onAccountsChanged([]);
         }
         setError(e);
         setLoading(false);
       })
-  }, [])
+  }, [accounts, onAccountsChanged, setAccounts, setError, setLoading])
 
   useEffect(() => {
-    props.onInstitutionChanged(requisition?.institution_id);
-  }, [requisition])
+    onInstitutionChanged(requisition?.institution_id);
+  }, [onInstitutionChanged, requisition])
 
   if (isLoading)
     return <Box>Loading...</Box>;
