@@ -1,5 +1,5 @@
 import { Box, List, ListItem, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountDetails } from '../lib/nordigen';
 
 type AccountSummaryProps = {
@@ -13,34 +13,34 @@ const AccountSummary = (props: AccountSummaryProps) => <ListItem bg={props.selec
 
 export type AccountsProps = {
   accountIds: string[];
-  onSelectAccount: (id: string) => void;
-  selectedAccount: string;
+  onSelectAccount: (id: string | undefined) => void;
+  selectedAccount: string | undefined;
 };
 
-export const Accounts = (props: AccountsProps) => {
+export const Accounts = ({ onSelectAccount, accountIds, selectedAccount }: AccountsProps) => {
   const [accountDetails, setAccountDetails] = useState<AccountDetails[]>([])
   const [error, setError] = useState<string>("")
   const [isLoading, setLoading] = useState(false)
-  const accounts = useMemo(() => props.accountIds, [props.accountIds]);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all(accounts.map(id =>
+    Promise.all(accountIds.map(id =>
       fetch(`api/accounts/${id}`)
         .then(async (res) => {
+          onSelectAccount(undefined);
           if (res.status != 200) throw new Error(await res.text())
           return res.json()
         })))
       .then((data: AccountDetails[]) => {
-        setAccountDetails(data);
         setLoading(false);
+        setAccountDetails(data);
       }).catch((e) => {
+        setLoading(false);
         console.log("Error fetching accounts", e)
         setAccountDetails([]);
         setError(e);
-        setLoading(false);
       });
-  }, [accounts])
+  }, [accountIds, onSelectAccount])
 
   if (isLoading)
     return <Box>Loading...</Box>;
@@ -51,7 +51,7 @@ export const Accounts = (props: AccountsProps) => {
   return <Box>
     <Text>Accounts</Text>
     <List>{accountDetails.map(d =>
-      <AccountSummary key={d.id} id={d.id} name={d.name} type={d.bban} onSelect={(id) => props.onSelectAccount(id)} selected={props.selectedAccount == d.id} />)}
+      <AccountSummary key={d.id} id={d.id} name={d.name} type={d.bban} onSelect={(id) => onSelectAccount(id)} selected={selectedAccount == d.id} />)}
     </List>
   </Box>
 }

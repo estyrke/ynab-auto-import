@@ -30,7 +30,7 @@ const UnlinkButton = ({ onUnlink }: UnlinkButtonProps) => {
       .then((data) => {
         console.log("Bank unlinked successfully");
         onUnlink();
-      }).catch(console.log)
+      }).catch((e) => console.log("Error unlinking bank", e))
   }, [onUnlink])
   return <Button onClick={unlinkAccount}>Remove bank link</Button>
 }
@@ -50,7 +50,6 @@ type RequisitionProps = {
 
 export const Requisition = ({ onAccountsChanged, onInstitutionChanged }: RequisitionProps) => {
   const [requisition, setRequisition] = useState<RequisitionData | null>(null);
-  const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
 
@@ -58,30 +57,22 @@ export const Requisition = ({ onAccountsChanged, onInstitutionChanged }: Requisi
     setLoading(true);
     fetch('api/requisition')
       .then(async (res) => {
+        setLoading(false);
         if (res.status != 200) throw new Error(await res.text())
 
         return res.json()
       })
       .then((data: RequisitionData) => {
         setRequisition(data);
-        if (data.accounts != accounts) {
-          setAccounts(data.accounts);
-
-          onAccountsChanged(data.accounts);
-        }
+        onAccountsChanged(data.accounts);
         setError("");
-        setLoading(false);
       }).catch((e) => {
-        console.log(e);
+        console.log("Error fetching requisition", e);
         setRequisition(null);
-        if ([] != accounts) {
-          setAccounts([]);
-          onAccountsChanged([]);
-        }
+        onAccountsChanged([]);
         setError(e);
-        setLoading(false);
       })
-  }, [accounts, onAccountsChanged, setAccounts, setError, setLoading])
+  }, [onAccountsChanged])
 
   useEffect(() => {
     onInstitutionChanged(requisition?.institution_id);

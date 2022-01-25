@@ -13,13 +13,13 @@ export type NordigenProps = {
 
 export const Nordigen = (props: NordigenProps) => {
   const [accounts, setAccounts] = useState<string[]>([]);
-  const [selectedAccount, setSelectedAccount] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState<string | undefined>();
 
   const onAccountsChanged = useCallback((accountIds: string[]) => {
     console.log("Got accounts", accountIds);
     return setAccounts(accountIds);
   }, [setAccounts]);
-  const onSelectAccount = useCallback((id: string) => {
+  const onSelectAccount = useCallback((id: string | undefined) => {
     setSelectedAccount(id);
   }, [setSelectedAccount]);
 
