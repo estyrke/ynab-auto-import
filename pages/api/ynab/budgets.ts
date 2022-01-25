@@ -1,13 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { API, SaveTransaction, BudgetSummaryResponse } from 'ynab';
+import { API, BudgetSummaryResponse } from 'ynab';
+import { ApiError } from '../../../lib/api.error';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<BudgetSummaryResponse>
+  res: NextApiResponse<BudgetSummaryResponse | ApiError>
 ) {
-  const ynab = new API(process.env.YNAB_TOKEN ?? "");
+  const ynab = new API(req.headers.authorization?.split(" ")[1] ?? "");
 
-  console.log("Ynab getting budgets", process.env.YNAB_TOKEN)
+  console.log("Ynab getting budgets", req.headers.authorization?.split(" ")[1])
 
-  res.status(200).json(await ynab.budgets.getBudgets());
+  try {
+    const budgets = await ynab.budgets.getBudgets();
+    res.status(200).json(budgets);
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
 }

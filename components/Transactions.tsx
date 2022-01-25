@@ -1,4 +1,4 @@
-import { Box, Table, Td, Tr, Text, Th, Thead, ButtonGroup } from "@chakra-ui/react"
+import { Box, Table, Td, Tr, Text, Th, Thead, ButtonGroup, Tbody } from "@chakra-ui/react"
 import { Form, Formik } from "formik";
 import { InputControl, SubmitButton } from "formik-chakra-ui";
 import { useEffect, useState } from "react"
@@ -64,12 +64,16 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
   const pKeys = Array.from(pHeadings.keys());
   return <>
     <Table size="sm" fontSize="xx-small">
-      <Thead>Booked</Thead>
-      {transactionData?.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      <Thead><Tr><Th>Booked</Th></Tr></Thead>
+      <Tbody>
+        {transactionData?.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      </Tbody>
     </Table>
     <Table>
-      <Thead>Pending</Thead>
-      {transactionData?.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      <Thead><Tr><Th>Pending</Th></Tr></Thead>
+      <Tbody>
+        {transactionData?.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+      </Tbody>
     </Table>
     <Formik
       initialValues={{}}
