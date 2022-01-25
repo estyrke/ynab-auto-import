@@ -36,7 +36,7 @@ export const loadSession = async (req: NextApiRequest): Promise<Session> => {
     console.warn("No session present");
     return {};
   }
-  const key = await JWK.asKey(process.env.MONEY_JWK ?? "");
+  const key = await JWK.asKey(process.env.COOKIE_JWK ?? "");
   const dec = JWE.createDecrypt(key);
 
   const encSession = JSON.parse(req.cookies["MONEY_SESSION"]);
@@ -52,7 +52,7 @@ export const loadSession = async (req: NextApiRequest): Promise<Session> => {
 export const saveSession = async (res: NextApiResponse, session: Session): Promise<void> => {
   console.log("Session is", session);
 
-  const key = await JWK.asKey(process.env.MONEY_JWK ?? "");
+  const key = await JWK.asKey(process.env.COOKIE_JWK ?? "");
   const enc = JWE.createEncrypt(key);
   enc.update(Buffer.from(JSON.stringify(session)));
   const encSession = await enc.final();
