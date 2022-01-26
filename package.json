@@ -8,7 +8,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^1.1.1",
     "@chakra-ui/react": "^1.7.4",
+    "@clerk/nextjs": "^2.9.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "cookie": "^0.4.1",
