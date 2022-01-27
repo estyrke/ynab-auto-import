@@ -1,10 +1,8 @@
-import { Box, Table, Td, Tr, Text, Th, Thead, ButtonGroup, Tbody } from "@chakra-ui/react"
+import { Box, Table, Td, Tr, Th, Thead, ButtonGroup, Tbody } from "@chakra-ui/react"
 import { Form, Formik } from "formik";
 import { InputControl, SubmitButton } from "formik-chakra-ui";
-import { useEffect, useState } from "react"
-import { TransactionData, Amount, Transaction } from '../lib/nordigen';
-
-const Amount = ({ amount }: { amount: Amount }) => <Text>{amount.amount} {amount.currency}</Text>;
+import { useTransactions } from "../hooks/useTransactions";
+import { Transaction } from '../lib/nordigen';
 
 const TransactionLine = ({ transaction, keys }: { transaction: any; keys: string[] }) => {
 
@@ -13,81 +11,48 @@ const TransactionLine = ({ transaction, keys }: { transaction: any; keys: string
 }
 
 export type TransactionsProps = {
-  accountId?: string;
+  accountId: string;
   onSelectTransactions: (transactions: Transaction[]) => void;
 }
 
 export const Transactions = ({ accountId, onSelectTransactions }: TransactionsProps) => {
-  const [transactionData, setTransactionData] = useState<TransactionData | null>(null)
-  const [error, setError] = useState<string>("")
-  const [isLoading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (!accountId) {
-      setTransactionData(null);
-      setError("");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    fetch(`api/transactions/${accountId}`)
-      .then(async (res) => {
-        if (res.status != 200) throw new Error(await res.text())
-        return res.json()
-      })
-      .then((data: TransactionData) => {
-        setTransactionData(data);
-        setLoading(false);
-      }).catch((e) => {
-        console.log(`Error fetching transactions for ${accountId}`, e)
-        setTransactionData(null);
-        setError(e);
-        setLoading(false);
-      });
-  }, [accountId])
-
-  if (!accountId) {
-    return <Box>No account selected</Box>
-  }
-
-  if (isLoading)
-    return <Box>Loading...</Box>;
+  const { transactions, error } = useTransactions(accountId);
 
   if (error)
     return <Box>{JSON.stringify(error)}</Box>;
 
+  if (!transactions)
+    return <Box>Loading...</Box>;
+
   const bHeadings = new Set<string>();
-  transactionData?.booked.forEach((t) => Object.keys(t).forEach((k) => bHeadings.add(k)));
+  transactions.booked.forEach((t) => Object.keys(t).forEach((k) => bHeadings.add(k)));
   const bKeys = Array.from(bHeadings.keys());
   const pHeadings = new Set<string>();
-  transactionData?.pending.forEach((t) => Object.keys(t).forEach((k) => pHeadings.add(k)));
+  transactions.pending.forEach((t) => Object.keys(t).forEach((k) => pHeadings.add(k)));
   const pKeys = Array.from(pHeadings.keys());
   return <>
     <Table size="sm" fontSize="xx-small">
       <Thead><Tr><Th>Booked</Th></Tr></Thead>
       <Tbody>
-        {transactionData?.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+        {transactions.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
       </Tbody>
     </Table>
     <Table>
       <Thead><Tr><Th>Pending</Th></Tr></Thead>
       <Tbody>
-        {transactionData?.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
+        {transactions.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
       </Tbody>
     </Table>
     <Formik
       initialValues={{}}
-      validate={() => transactionData ? {} : new Error("Must select an account first")}
       onSubmit={(values, actions) => {
-        if (transactionData) {
-          onSelectTransactions(transactionData.booked);
-        }
+        onSelectTransactions(transactions.booked);
         actions.setSubmitting(false);
       }}
     >
       {() => (
         <Form>
-          <InputControl inputProps={{ type: "date" }} name='ynabToken' label="Personal Access Token" />
+          <InputControl inputProps={{ type: "date" }} name='ynabToken' label="Start Date" />
           <ButtonGroup><SubmitButton>Submit</SubmitButton></ButtonGroup>
         </Form>
       )}
@@ -97,11 +62,11 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
   return <>
     <Table size="sm" fontSize="xx-small">
       <Thead>{bKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
-      {transactionData?.booked.map(t => <TransactionLine key={t.transactionId} transaction={t} keys={bKeys} />)}
+      {transactions?.booked.map(t => <TransactionLine key={t.transactionId} transaction={t} keys={bKeys} />)}
     </Table>
     <Table>
       <Thead>{pKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
-      {transactionData?.pending.map((t, i) => <TransactionLine key={i} transaction={t} keys={pKeys} />)}
+      {transactions?.pending.map((t, i) => <TransactionLine key={i} transaction={t} keys={pKeys} />)}
     </Table>
   </>
 }

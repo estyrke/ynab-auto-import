@@ -1,10 +1,11 @@
 import { Box, ButtonGroup, Heading, Select, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { InputControl, SubmitButton } from 'formik-chakra-ui';
-import { AccountsResponse, BudgetSummaryResponse, AccountResponse } from 'ynab';
 import { YnabTransaction } from "../pages/api/ynab/createTransactions";
 import { YnabTransactionsToImport } from "./YnabTransactionsToImport";
+import { useYnabBudgets } from "../hooks/useYnabBudgets";
+import { useYnabAccounts } from '../hooks/useYnabAccounts';
 
 type YnabTokenProps = {
   token: string;
@@ -32,64 +33,45 @@ type YnabBudgetListProps = {
 };
 
 const YnabBudgetList = ({ token, onBudgetSelected }: YnabBudgetListProps) => {
-  const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState();
-  const [budgets, setBudgets] = useState<BudgetSummaryResponse | undefined>(undefined);
+  const { budgets, error } = useYnabBudgets(token);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch(`api/ynab/budgets`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
-        setLoading(false);
-        if (res.status != 200) throw new Error(await res.text())
-        return res.json()
-      }).then(setBudgets).catch((e) => {
-        console.log("Error fetching budgets", e)
-        setError(e);
-      });
-  }, [token]);
-
+  console.log(budgets, error);
+  let defaultText = "--- Select a budget ---";
+  if (error)
+    defaultText = `--- ${JSON.stringify(error.info)} ---`;
+  else if (!budgets)
+    defaultText = "--- Loading ... ---";
 
   return <Select onChange={(e) => {
     console.log("Selected budget", e.currentTarget.value);
     return onBudgetSelected(e.currentTarget.value);
   }}>
-    <option value="">{isLoading ? "--- Loading ... ---" : "--- Select a budget ---"}</option>
-    {budgets?.data.budgets.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+    <option value="">{defaultText}</option>
+    {budgets?.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
   </Select>
 }
 
 type YnabAccountListProps = {
-  budget?: string;
+  budget: string;
   token?: string;
   onAccountSelected: (accountId: string | undefined) => void;
 };
 
 const YnabAccountList = ({ budget, token, onAccountSelected }: YnabAccountListProps) => {
-  const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState();
-  const [accounts, setAccounts] = useState<AccountsResponse | undefined>(undefined);
+  const { accounts, error, isLoading } = useYnabAccounts(budget, token);
 
-  useEffect(() => {
-    if (!budget) return;
-    setLoading(true);
-    fetch(`api/ynab/budgets/${budget}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
-        setLoading(false);
-        if (res.status != 200) throw new Error(await res.text())
-        return res.json()
-      }).then(setAccounts).catch(e => {
-        console.log("Error fetching accounts", e);
-        setError(e);
-      });
-  }, [budget, token]);
+  let defaultText = "--- Select an account ---";
+  if (error)
+    defaultText = `--- ${JSON.stringify(error.info)} ---`;
+  else if (isLoading)
+    defaultText = "--- Loading ... ---";
 
   return <Select onChange={(e) => {
     console.log("Selected account", e.currentTarget.value);
     return onAccountSelected(e.currentTarget.value);
   }}>
-    <option value="">{isLoading ? "--- Loading ... ---" : "--- Select an account ---"}</option>
-    {accounts?.data.accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+    <option value="">{defaultText}</option>
+    {accounts?.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
   </Select>
 }
 
@@ -105,8 +87,8 @@ export const Ynab = (props: YnabProps) => {
   return <>
     <Heading as="h1">YNAB Settings</Heading>
     <YnabToken token={token} onChangeToken={setToken} />
-    <YnabBudgetList token={token} onBudgetSelected={setBudget} />
-    <YnabAccountList token={token} budget={budget} onAccountSelected={setAccount} />
+    {token ? <YnabBudgetList token={token} onBudgetSelected={setBudget} /> : undefined}
+    {budget ? <YnabAccountList token={token} budget={budget} onAccountSelected={setAccount} /> : undefined}
     <Box><Text>{account}</Text></Box>
     <YnabTransactionsToImport token={token} budgetId={budget} accountId={account} transactions={props.transactionsToImport} />
   </>;

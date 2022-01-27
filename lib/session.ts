@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { serialize, CookieSerializeOptions } from 'cookie'
-
 import { JWE, JWK } from 'node-jose';
 import { Tokens } from './nordigen';
 

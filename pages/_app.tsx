@@ -1,9 +1,11 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import { useRouter } from 'next/router';
 import theme from './theme';
+import { SWRConfig } from 'swr';
+import { fetcher } from '../lib/fetcher';
 
 //  List pages you want to be publicly accessible, or leave empty if
 //  every page requires authentication. Use this naming strategy:
@@ -21,18 +23,20 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ClerkProvider>
-        {isPublicPage ? (
-          <Component {...pageProps} />
-        ) : (
-          <>
-            <SignedIn>
-              <Component {...pageProps} />
-            </SignedIn>
-            <SignedOut>
-              <RedirectToSignIn />
-            </SignedOut>
-          </>
-        )}
+        <SWRConfig value={{ fetcher }}>
+          {isPublicPage ? (
+            <Component {...pageProps} />
+          ) : (
+            <>
+              <SignedIn>
+                <Component {...pageProps} />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          )}
+        </SWRConfig>
       </ClerkProvider>
     </ChakraProvider>)
 }

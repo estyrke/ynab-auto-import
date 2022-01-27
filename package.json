@@ -21,6 +21,7 @@
     "node-jose": "^2.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "swr": "^1.2.0",
     "ynab": "^1.27.0"
   },
   "devDependencies": {

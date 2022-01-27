@@ -1,13 +1,14 @@
 
+import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { API, AccountsResponse } from 'ynab';
 import { ApiError } from '../../../../lib/api.error';
 
-export default async function handler(
-  req: NextApiRequest,
+export default requireSession(async (
+  req: WithSessionProp<NextApiRequest>,
   res: NextApiResponse<AccountsResponse | ApiError>
-) {
-  const ynab = new API(req.headers.authorization?.split(" ")[1] ?? "");
+) => {
+  const ynab = new API(req.headers.token?.toString() ?? "");
 
   console.log("Ynab getting accounts", req.query.id)
 
@@ -17,4 +18,4 @@ export default async function handler(
   } catch (e) {
     res.status(400).json({ error: e });
   }
-}
+});

@@ -1,9 +1,10 @@
-import { Heading } from "@chakra-ui/react";
-import { useCallback, useState } from 'react';
+import { Box, Heading } from "@chakra-ui/react";
+import { useCallback, useEffect, useState } from 'react';
 import { Transaction } from "../lib/nordigen";
 import { Accounts } from "./Accounts";
 import { Requisition } from "./Requisition";
 import { Transactions } from "./Transactions";
+import { useRequisition } from '../hooks/useRequisition';
 
 
 export type NordigenProps = {
@@ -11,22 +12,27 @@ export type NordigenProps = {
   onSelectTransactions: (transactions: Transaction[]) => void;
 };
 
-export const Nordigen = (props: NordigenProps) => {
-  const [accounts, setAccounts] = useState<string[]>([]);
+export const Nordigen = ({ onInstitutionChanged, onSelectTransactions }: NordigenProps) => {
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>();
+  const { requisition } = useRequisition();
+  const institutionId = requisition?.institution_id;
 
-  const onAccountsChanged = useCallback((accountIds: string[]) => {
-    console.log("Got accounts", accountIds);
-    return setAccounts(accountIds);
-  }, [setAccounts]);
+  useEffect(() => {
+    onInstitutionChanged(institutionId);
+  }, [institutionId, onInstitutionChanged]);
+
   const onSelectAccount = useCallback((id: string | undefined) => {
     setSelectedAccount(id);
   }, [setSelectedAccount]);
 
   return <>
     <Heading as="h1">Bank settings</Heading>
-    <Requisition onInstitutionChanged={props.onInstitutionChanged} onAccountsChanged={onAccountsChanged} />
-    <Accounts accountIds={accounts} onSelectAccount={onSelectAccount} selectedAccount={selectedAccount} />
-    <Transactions accountId={selectedAccount} onSelectTransactions={props.onSelectTransactions} />
+    <Requisition />
+    <Accounts onSelectAccount={onSelectAccount} selectedAccount={selectedAccount} />
+    {selectedAccount
+      ? <Transactions accountId={selectedAccount} onSelectTransactions={onSelectTransactions} />
+      : <Box>No account selected</Box>}
+
+
   </>;
 }

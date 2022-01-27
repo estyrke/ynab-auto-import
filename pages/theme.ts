@@ -1,5 +1,5 @@
-import { extendTheme, Theme, ThemeConfig } from '@chakra-ui/react'
-import { mode, StyleFunctionProps, Styles } from "@chakra-ui/theme-tools"
+import { extendTheme, ThemeConfig } from '@chakra-ui/react'
+import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools"
 
 const config: ThemeConfig = {
   initialColorMode: 'system',

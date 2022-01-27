@@ -1,8 +1,9 @@
-import { Box, Button, Circle, Container, Flex, Heading, HStack, Spacer, useColorMode, VStack } from "@chakra-ui/react";
+import { Button, Circle, Container, Flex, Heading, HStack, Spacer, useColorMode, VStack } from "@chakra-ui/react";
 import Head from "next/head";
 import { PropsWithChildren } from "react";
 import { DownloadIcon } from "@chakra-ui/icons";
 import Link from "./Link";
+import { UserButton } from "@clerk/nextjs";
 
 export const SiteContainer = ({ children }: PropsWithChildren<{}>) => {
   const { toggleColorMode } = useColorMode();
@@ -20,6 +21,7 @@ export const SiteContainer = ({ children }: PropsWithChildren<{}>) => {
           <Link href="/"><Heading> YNAB-auto-import</Heading></Link>
           <Spacer />
           <Link href="/import">Import</Link><Button onClick={toggleColorMode}>Switch theme</Button>
+          <UserButton />
         </HStack>
         <VStack alignItems="flex-start" dropShadow="lg" borderRadius="md">
           {children}

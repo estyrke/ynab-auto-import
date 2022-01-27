@@ -1,7 +1,7 @@
+import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import { IncomingMessage } from 'http';
-import { request } from 'https'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createRequisition, getTokens, RequisitionData } from '../../lib/nordigen';
+import { createRequisition, RequisitionData } from '../../lib/nordigen';
 import { loadSession, saveSession } from '../../lib/session';
 
 function absoluteUrl(
@@ -35,14 +35,14 @@ function absoluteUrl(
   }
 }
 
-export default async function handler(
-  req: NextApiRequest,
+export default requireSession(async (
+  req: WithSessionProp<NextApiRequest>,
   res: NextApiResponse<RequisitionData>
-) {
+) => {
   const session = await loadSession(req);
   const requisition = await createRequisition(`${absoluteUrl(req).origin}/`, session);
 
   session.req_id = requisition.id;
   await saveSession(res, session);
   res.status(200).json(requisition);
-}
+});

@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { Heading, Text, VStack } from '@chakra-ui/react';
+import { Heading, Text } from '@chakra-ui/react';
 import { SiteContainer } from '../components/SiteContainer';
 
 

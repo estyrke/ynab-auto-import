@@ -1,12 +1,13 @@
+import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { TransactionData, getTransactions } from '../../../lib/nordigen';
 import { loadSession, saveSession } from '../../../lib/session';
 
 
-export default async function handler(
-  req: NextApiRequest,
+export default requireSession(async (
+  req: WithSessionProp<NextApiRequest>,
   res: NextApiResponse<TransactionData>
-) {
+) => {
   const session = await loadSession(req);
 
   const account = await getTransactions(req.query.accountId as string, session);
@@ -14,4 +15,4 @@ export default async function handler(
   await saveSession(res, session);
 
   res.status(200).json(account);
-}
+});

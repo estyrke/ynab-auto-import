@@ -1,12 +1,13 @@
+import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getRequisition, RequisitionData } from '../../lib/nordigen';
 import { loadSession, saveSession } from '../../lib/session';
 
 
-export default async function handler(
-  req: NextApiRequest,
+export default requireSession(async (
+  req: WithSessionProp<NextApiRequest>,
   res: NextApiResponse<RequisitionData>
-) {
+) => {
   const session = await loadSession(req);
 
   console.log("Requisition id from session: ", session.req_id);
@@ -22,4 +23,4 @@ export default async function handler(
   session.req_status = requisition.status;
   await saveSession(res, session);
   res.status(200).json(requisition);
-}
+});
