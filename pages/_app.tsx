@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import { useRouter } from 'next/router';
-import theme from './theme';
+import theme from '../lib/theme';
 import { SWRConfig } from 'swr';
 import { fetcher } from '../lib/fetcher';
 
