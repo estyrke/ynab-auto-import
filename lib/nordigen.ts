@@ -1,4 +1,3 @@
-import { tokenToCSSVar } from "@chakra-ui/react";
 import { request } from "https";
 import { Session } from "./session";
 
@@ -143,8 +142,10 @@ export type AccountDetails = {
 export const getAccount = async (id: string, session: Session) => (await get<{ account: AccountDetails }>(`/api/v2/accounts/${id}/details/`, session)).account;
 
 
+export type Currency = string;  // TODO: enum?
+
 export type Amount = {
-  currency: string;
+  currency: Currency;
   amount: string;
 };
 
@@ -154,6 +155,13 @@ export type PendingTransaction = {
   remittanceInformationUnstructured: string;
 };
 
+export type CurrencyExchange = {
+  exchangeRate: string;
+  instructedAmount: Amount;
+  sourceCurrency: Currency;
+  targetCurrency: Currency;
+  unitCurrency: Currency;
+}
 
 export type Transaction = PendingTransaction & {
   transactionId: string;
@@ -161,9 +169,13 @@ export type Transaction = PendingTransaction & {
   debtorName?: string;
   creditorAccount?: Account;
   debtorAccount?: Account;
-  bankTransactionCode: string;
+  bankTransactionCode?: string;
   bookingDate: string;
+  entryReference?: string;
+  additionalInformation?: string;
+  currencyExchange?: CurrencyExchange;
 };
+
 
 
 export type TransactionData = {

@@ -32,7 +32,5 @@ export const Nordigen = ({ onInstitutionChanged, onSelectTransactions }: Nordige
     {selectedAccount
       ? <Transactions accountId={selectedAccount} onSelectTransactions={onSelectTransactions} />
       : <Box>No account selected</Box>}
-
-
   </>;
 }

@@ -1,21 +1,22 @@
-import { Box, Table, Td, Tr, Th, Thead, ButtonGroup, Tbody } from "@chakra-ui/react"
+import { Box, Table, Td, Tr, Th, Thead, ButtonGroup, Tbody, Text } from "@chakra-ui/react"
 import { Form, Formik } from "formik";
-import { InputControl, SubmitButton } from "formik-chakra-ui";
+import { SubmitButton } from "formik-chakra-ui";
 import { useTransactions } from "../hooks/useTransactions";
 import { Transaction } from '../lib/nordigen';
 
 const TransactionLine = ({ transaction, keys }: { transaction: any; keys: string[] }) => {
 
   return <Tr>
-    {keys.map(k => <Td key={k}>{typeof (transaction[k]) == "string" ? transaction[k] : JSON.stringify(transaction[k])}</Td>)}</Tr>
+    {keys.map(k => <Td key={k}>{typeof (transaction[k]) == "string" ? transaction[k] : JSON.stringify(transaction[k], undefined, 1)}</Td>)}</Tr>
 }
 
-export type TransactionsProps = {
+export interface TransactionsProps {
   accountId: string;
   onSelectTransactions: (transactions: Transaction[]) => void;
+  fullTable?: boolean;
 }
 
-export const Transactions = ({ accountId, onSelectTransactions }: TransactionsProps) => {
+export const Transactions = ({ fullTable = false, accountId, onSelectTransactions }: TransactionsProps) => {
   const { transactions, error } = useTransactions(accountId);
 
   if (error)
@@ -30,19 +31,31 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
   const pHeadings = new Set<string>();
   transactions.pending.forEach((t) => Object.keys(t).forEach((k) => pHeadings.add(k)));
   const pKeys = Array.from(pHeadings.keys());
+
+  let table;
+
+  if (fullTable) {
+    table = <>
+      <Table size="sm" fontSize="xx-small">
+        <Thead>{bKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
+        <Tbody>
+          {transactions?.booked.map(t => <TransactionLine key={t.transactionId} transaction={t} keys={bKeys} />)}
+        </Tbody>
+      </Table>
+      <Table>
+        <Thead>{pKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
+        <Tbody>
+          {transactions?.pending.map((t, i) => <TransactionLine key={i} transaction={t} keys={pKeys} />)}
+        </Tbody>
+      </Table>
+    </>
+  } else {
+    table = <>
+      <Text>{transactions.booked.length} transactions to import</Text>
+    </>
+  }
   return <>
-    <Table size="sm" fontSize="xx-small">
-      <Thead><Tr><Th>Booked</Th></Tr></Thead>
-      <Tbody>
-        {transactions.booked.map(t => <Tr key={t.transactionId}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
-      </Tbody>
-    </Table>
-    <Table>
-      <Thead><Tr><Th>Pending</Th></Tr></Thead>
-      <Tbody>
-        {transactions.pending.map((t, i) => <Tr key={i}><Td>{JSON.stringify(t, undefined, 1)}</Td></Tr>)}
-      </Tbody>
-    </Table>
+    {table}
     <Formik
       initialValues={{}}
       onSubmit={(values, actions) => {
@@ -52,21 +65,9 @@ export const Transactions = ({ accountId, onSelectTransactions }: TransactionsPr
     >
       {() => (
         <Form>
-          <InputControl inputProps={{ type: "date" }} name='ynabToken' label="Start Date" />
-          <ButtonGroup><SubmitButton>Submit</SubmitButton></ButtonGroup>
+          <ButtonGroup><SubmitButton>Select for import</SubmitButton></ButtonGroup>
         </Form>
       )}
     </Formik>
-  </>
-
-  return <>
-    <Table size="sm" fontSize="xx-small">
-      <Thead>{bKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
-      {transactions?.booked.map(t => <TransactionLine key={t.transactionId} transaction={t} keys={bKeys} />)}
-    </Table>
-    <Table>
-      <Thead>{pKeys.map(t => <Th key={t}>{t}</Th>)}</Thead>
-      {transactions?.pending.map((t, i) => <TransactionLine key={i} transaction={t} keys={pKeys} />)}
-    </Table>
   </>
 }

@@ -1,4 +1,4 @@
-import { Button, Table, Tr, Td, Text, Tbody, Thead, Th, Box } from '@chakra-ui/react';
+import { Button, Table, Tr, Td, Text, Tbody, Thead, Th, Box, Tooltip } from '@chakra-ui/react';
 import { YnabTransaction } from '../pages/api/ynab/createTransactions';
 import { useCallback, useState } from 'react';
 
@@ -7,8 +7,10 @@ type YnabTransactionsToImportProps = {
   budgetId?: string;
   accountId?: string;
   transactions: YnabTransaction[];
+  transactionTooltips: string[];
 }
-export const YnabTransactionsToImport = ({ token, transactions, budgetId, accountId }: YnabTransactionsToImportProps) => {
+
+export const YnabTransactionsToImport = ({ token, transactions, budgetId, accountId, transactionTooltips }: YnabTransactionsToImportProps) => {
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
 
@@ -42,7 +44,10 @@ export const YnabTransactionsToImport = ({ token, transactions, budgetId, accoun
         <Tr><Th>Date</Th><Th>Payee</Th><Th>Memo</Th><Th>Amount</Th></Tr>
       </Thead>
       <Tbody>
-        {transactions.map((t) => <Tr key={t.import_id}><Td>{t.date}</Td><Td>{t.payee_name}</Td><Td>{t.memo}</Td><Td>{t.amount}</Td></Tr>)}
+        {transactions.map((t, i) => (
+          <Tooltip key={t.import_id} label={transactionTooltips[i]}>
+            <Tr ><Td>{t.date}</Td><Td>{t.payee_name}</Td><Td>{t.memo}</Td><Td>{t.amount / 1000}</Td></Tr>
+          </Tooltip>))}
       </Tbody>
     </Table>
     <Button disabled={isLoading || !budgetId || !accountId || !token} onClick={doImport}>{isLoading ? "Importing..." : "Import"}</Button>
