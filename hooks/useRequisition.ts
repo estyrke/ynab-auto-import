@@ -3,8 +3,8 @@ import { ApiError } from "../lib/api.error";
 import { RequisitionData } from "../lib/nordigen";
 
 
-export const useRequisition = () => {
-  const { data, error, mutate } = useSWR<RequisitionData, ApiError>("api/requisition");
+export const useRequisition = (id: string) => {
+  const { data, error, mutate } = useSWR<RequisitionData, ApiError>(`api/requisitions/${id}`);
 
   return {
     requisition: data,

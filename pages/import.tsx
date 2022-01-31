@@ -14,7 +14,7 @@ const Import: NextPage = () => {
   const [transactions, setTransactions] = useState<YnabTransaction[]>([]);
   const [institutionId, setInstitutionId] = useState<string | undefined>(undefined);
 
-  const onSelectTransactions = useCallback((selectedTransactions: Transaction[]) => {
+  const onSelectTransactions = useCallback((institutionId: string, accountId: string, selectedTransactions: Transaction[]) => {
     console.log(`Selected ${selectedTransactions.length} transactions from ${institutionId}`)
     setOriginalTransactions(selectedTransactions);
     if (institutionId) {
@@ -22,11 +22,11 @@ const Import: NextPage = () => {
     } else {
       setTransactions([]);
     }
-  }, [institutionId])
+  }, [])
 
   return (<SiteContainer>
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start" >
-      <Nordigen onInstitutionChanged={setInstitutionId} onSelectTransactions={onSelectTransactions} />
+      <Nordigen onSelectTransactions={onSelectTransactions} />
     </VStack>
     <VStack VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start" >
       <Ynab transactionsToImport={transactions} originalTransactions={originalTransactions} />

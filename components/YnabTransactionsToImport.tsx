@@ -28,7 +28,7 @@ export const YnabTransactionsToImport = ({ token, transactions, budgetId, accoun
     })
       .then(async (res) => {
         setLoading(false);
-        if (res.status != 200) throw new Error(await res.text())
+        if (!res.ok) throw new Error(await res.text())
       }).catch((e) => {
         console.log(`Error importing to account ${accountId} of budget ${budgetId}`, e)
         setError(e);

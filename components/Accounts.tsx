@@ -11,7 +11,7 @@ const AccountSummary = (props: AccountSummaryProps) => {
   const { account, error } = useAccount(props.id);
 
   if (error) {
-    return <ListItem bg={props.selected ? "gray.200" : "default"} onClick={() => props.onSelect(props.id)}>Error: {JSON.stringify(error)}</ListItem>;
+    return <ListItem bg={props.selected ? "gray.200" : "default"} onClick={() => props.onSelect(props.id)}>Error: {error.error}</ListItem>;
   }
   else if (!account) {
     return <ListItem bg={props.selected ? "gray.200" : "default"} onClick={() => props.onSelect(props.id)}>Loading...</ListItem>;
@@ -21,12 +21,13 @@ const AccountSummary = (props: AccountSummaryProps) => {
 };
 
 export type AccountsProps = {
+  requisitionId: string;
   onSelectAccount: (id: string | undefined) => void;
   selectedAccount: string | undefined;
 };
 
-export const Accounts = ({ onSelectAccount, selectedAccount }: AccountsProps) => {
-  const { requisition, error } = useRequisition();
+export const Accounts = ({ onSelectAccount, selectedAccount, requisitionId }: AccountsProps) => {
+  const { requisition, error } = useRequisition(requisitionId);
 
   if (error)
     return <Box>Failed to fetch account list!</Box>;

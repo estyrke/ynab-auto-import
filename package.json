@@ -14,6 +14,7 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "cookie": "^0.4.1",
+    "faunadb": "^4.4.1",
     "formik": "^2.2.9",
     "formik-chakra-ui": "^1.6.0",
     "framer-motion": "^5",

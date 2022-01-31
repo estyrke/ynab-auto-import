@@ -1,5 +1,5 @@
 import { request } from "https";
-import { Session } from "./session";
+import { Session } from "./fauna";
 
 type TokenResponse = {
   access: string,
@@ -22,21 +22,20 @@ export type Tokens = {
 
 const makeRequest = async <Res>(method: string, path: string, body: any, session?: Session) =>
   new Promise<Res>(async (resolve, reject) => {
-    // TODO: add token refresh logic
-    let token = undefined;
+    let tokens = undefined;
     if (session) {
-      if (!session.tokens || session.tokens.refresh_expires < new Date()) {
-        session.tokens = await getTokens();
+      tokens = await session.getTokens();
+      if (!tokens?.refresh_expires || tokens.refresh_expires < new Date()) {
+        tokens = await session.updateTokens(await getTokens());
       }
-      else if (session.tokens.access_expires < new Date()) {
-        session.tokens = await refreshTokens(session.tokens);
+      else if (!tokens.access_expires || tokens.access_expires < new Date()) {
+        tokens = await session.updateTokens(await refreshTokens(tokens));
       }
-      token = session.tokens.access;
     }
     const postData = body !== undefined ? JSON.stringify(body) : "";
     console.log(`REQUEST URL: ${path}`)
     console.log(`REQUEST BODY: ${postData}`)
-    const auth = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const auth = tokens?.access ? { 'Authorization': `Bearer ${tokens.access}` } : {};
 
     const nreq = request({
       method, host: "ob.nordigen.com", path, headers: {
@@ -112,15 +111,43 @@ export type RequisitionData = {
   account_selection: boolean;
 };
 
-export const createRequisition = async (redirectUrl: string, session: Session) => post<RequisitionData>("/api/v2/requisitions/", {
+export type RequisitionStatusData = {
+  short: string;
+  long: string;
+  description: string;
+}
+export const requisitionStatus = (shortStatus?: string): RequisitionStatusData | undefined => ({
+  "CR": { "short": "CR", "long": "CREATED", "description": "Requisition has been successfully created" },
+  "LN": { "short": "LN", "long": "LINKED", "description": "Account has been successfully linked to requisition" },
+  "EX": { "short": "EX", "long": "EXPIRED", "description": "Access to account has expired as set in End User Agreement" },
+  "RJ": { "short": "RJ", "long": "REJECTED", "description": "SSN verification has failed" },
+  "UA": { "short": "UA", "long": "UNDERGOING_AUTHENTICATION", "description": "End-user is redirected to the financial institution for authentication" },
+  "GA": { "short": "GA", "long": "GRANTING_ACCESS", "description": "End-user is granting access to their account information" },
+  "SA": { "short": "SA", "long": "SELECTING_ACCOUNTS", "description": "End-user is selecting accounts" },
+  "GC": { "short": "GC", "long": "GIVING_CONSENT", "description": "End-user is giving consent at Nordigen's consent screen" }
+}[shortStatus ?? ""]);
+
+type RequisitionsData = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: RequisitionData[];
+}
+
+export type CreateRequisitionOptions = {
+  redirectUrl: string;
+  institutionId: string;
+};
+
+export const createRequisition = async ({ redirectUrl, institutionId }: CreateRequisitionOptions, session: Session) => post<RequisitionData>("/api/v2/requisitions/", {
   redirect: redirectUrl,
-  //institution_id: "SANDBOXFINANCE_SFIN0000",
-  institution_id: "DANSKEBANK_DABASESX"
+  institution_id: institutionId
 }, session);
 
 export const deleteRequisition = async (id: string, session: Session) => makeRequest<void>("DELETE", `/api/v2/requisitions/${id}/`, undefined, session);
 
 export const getRequisition = async (id: string, session: Session) => get<RequisitionData>(`/api/v2/requisitions/${id}/`, session);
+export const getRequisitions = async (session: Session) => (await (get<RequisitionsData>(`/api/v2/requisitions/`, session))).results;
 
 export type Account = {
   iban?: string;
@@ -184,3 +211,16 @@ export type TransactionData = {
 }
 
 export const getTransactions = async (accountId: string, session: Session) => (await get<{ transactions: TransactionData }>(`/api/v2/accounts/${accountId}/transactions/`, session)).transactions;
+
+
+export type InstitutionData = {
+  id: string;
+  name: string;
+  bic: string;
+  transaction_total_days: string;
+  countries: string[];
+  logo: string;
+};
+
+export const getInstitiutions = async (countryCode: string, session: Session) => get<InstitutionData[]>(`/api/v2/institutions/?country=${countryCode}`, session);
+export const getInstitiution = async (id: string, session: Session) => get<InstitutionData>(`/api/v2/institutions/${id}/`, session);
