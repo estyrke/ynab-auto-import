@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ClerkProvider>
-        <SWRConfig value={{ fetcher }}>
+        <SWRConfig value={{ fetcher, errorRetryCount: 3 }}>
           {isPublicPage ? (
             <Component {...pageProps} />
           ) : (
