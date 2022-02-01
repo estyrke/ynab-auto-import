@@ -10,7 +10,7 @@ export const SiteContainer = ({ children }: PropsWithChildren<{}>) => {
 
   return <Container maxW="container.xl">
     <Head>
-      <title>Danske Bank (SE) to YNAB</title>
+      <title>Bank Import (Sweden) for YNAB</title>
       <meta name="description" content="A tool to auto-import transactions from Danske Bank (SV) into YNAB" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
@@ -18,7 +18,7 @@ export const SiteContainer = ({ children }: PropsWithChildren<{}>) => {
       <VStack p={5} width="100%">
         <HStack width="100%" p={2} bg="teal.300" justifyContent="space-between" alignSelf="flex-start">
           <Circle bg="white" p={2}><DownloadIcon color="teal.300" /></Circle>
-          <Link href="/"><Heading> YNAB-auto-import</Heading></Link>
+          <Link href="/"><Heading>Bank Import (Sweden) for YNAB</Heading></Link>
           <Spacer />
           <Link href="/import">Import</Link><Button onClick={toggleColorMode}>Switch theme</Button>
           <UserButton />
