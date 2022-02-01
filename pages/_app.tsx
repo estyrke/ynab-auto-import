@@ -13,7 +13,7 @@ import { fetcher } from '../lib/fetcher';
 //   "/foo"           for pages/foo/index.js
 //   "/foo/bar"       for pages/foo/bar.js
 //   "/foo/[...bar]"  for pages/foo/[...bar].js
-const publicPages: string[] = ["/"];
+const publicPages: string[] = ["/", "/privacy"];
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter();
