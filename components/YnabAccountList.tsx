@@ -3,11 +3,10 @@ import { useYnabAccounts } from '../hooks/useYnabAccounts';
 
 type YnabAccountListProps = {
   budget: string;
-  token?: string;
   onAccountSelected: (accountId: string | undefined) => void;
 };
-export const YnabAccountList = ({ budget, token, onAccountSelected }: YnabAccountListProps) => {
-  const { accounts, error, isLoading } = useYnabAccounts(budget, token);
+export const YnabAccountList = ({ budget, onAccountSelected }: YnabAccountListProps) => {
+  const { accounts, error, isLoading } = useYnabAccounts(budget);
 
   let defaultText = "--- Select an account ---";
   if (error)

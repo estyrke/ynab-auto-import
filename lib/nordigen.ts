@@ -33,8 +33,6 @@ const makeRequest = async <Res>(method: string, path: string, body: any, session
       }
     }
     const postData = body !== undefined ? JSON.stringify(body) : "";
-    console.log(`REQUEST URL: ${path}`)
-    console.log(`REQUEST BODY: ${postData}`)
     const auth = tokens?.access ? { 'Authorization': `Bearer ${tokens.access}` } : {};
 
     const nreq = request({
@@ -44,12 +42,9 @@ const makeRequest = async <Res>(method: string, path: string, body: any, session
         ...auth
       }
     }, (nres) => {
-      console.log(`STATUS: ${nres.statusCode}`);
-      console.log(`HEADERS: ${JSON.stringify(nres.headers)}`);
       nres.setEncoding('utf8');
       let ndata = "";
       nres.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
         ndata += chunk;
       });
       nres.on('end', () => {

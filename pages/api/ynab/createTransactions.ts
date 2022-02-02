@@ -1,7 +1,8 @@
 import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { API, SaveTransaction } from 'ynab';
+import { SaveTransaction } from 'ynab';
 import { ApiError } from '../../../lib/api.error';
+import { withYnabApi } from '../../../lib/ynab';
 
 export type YnabTransaction = {
   date: string;
@@ -11,9 +12,10 @@ export type YnabTransaction = {
   import_id: string;
 }
 
-export default requireSession(async (
+export default requireSession(withYnabApi(async (
   req: WithSessionProp<NextApiRequest>,
-  res: NextApiResponse<void | ApiError>
+  res: NextApiResponse<void | ApiError>,
+  ynab
 ) => {
   const body = req.body;
   const transactions: YnabTransaction[] = body.transactions;
@@ -35,8 +37,6 @@ export default requireSession(async (
     return;
   }
 
-  const ynab = new API(req.headers.token?.toString() ?? "");
-
   try {
     await ynab.transactions.createTransactions(budgetId, {
       transactions: transactions.map((t) => ({
@@ -51,4 +51,4 @@ export default requireSession(async (
     res.status(400).json({ error: e });
 
   }
-});
+}));

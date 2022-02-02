@@ -1,15 +1,19 @@
 
 import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { API, AccountsResponse } from 'ynab';
+import { AccountsResponse } from 'ynab';
 import { ApiError } from '../../../../lib/api.error';
+import { withYnabApi } from '../../../../lib/ynab';
 
-export default requireSession(async (
+export default requireSession(withYnabApi(async (
   req: WithSessionProp<NextApiRequest>,
-  res: NextApiResponse<AccountsResponse | ApiError>
+  res: NextApiResponse<AccountsResponse | ApiError>,
+  ynab
 ) => {
-  const ynab = new API(req.headers.token?.toString() ?? "");
-
+  if (!req.session?.userId) {
+    res.status(400).json({ error: "Missing userId" })
+    return;
+  }
   console.log("Ynab getting accounts", req.query.id)
 
   try {
@@ -18,4 +22,4 @@ export default requireSession(async (
   } catch (e) {
     res.status(400).json({ error: e });
   }
-});
+}));

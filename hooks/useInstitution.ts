@@ -4,7 +4,7 @@ import useSWRImmutable from 'swr/immutable';
 
 
 export const useInstitution = (id?: string) => {
-  const { data, error } = useSWRImmutable<InstitutionData, ApiError>(`api/institutions/${id}`);
+  const { data, error } = useSWRImmutable<InstitutionData, ApiError>(id ? `api/institutions/${id}` : undefined);
 
   return {
     institution: data,

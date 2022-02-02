@@ -1,4 +1,4 @@
-import { Client, Ref, Collection, Get, Match, Index, Update, If, Exists, Create, Let, Var, Expr, ToDate, values } from 'faunadb';
+import { Client, Ref, Collection, Get, Match, Index, Update, If, Exists, Create, Let, Var, Expr, values } from 'faunadb';
 import { Tokens } from './nordigen';
 
 export const createClient = () => new Client({
@@ -50,7 +50,6 @@ export class Session {
   }
 
   public readonly updateTokens = async (tokens: Tokens): Promise<Tokens | undefined> => {
-    console.log("Updating tokens", tokens);
     const updated = await this.client.query<GlobalDocument>(
       Update(
         Ref(Collection("Globals"), 1),
@@ -77,9 +76,20 @@ export type AccountLink = {
   ynabAccount: string;
 };
 
+export type YnabTokens = {
+  access_token: string;
+  access_expires: Date;
+  refresh_token: string;
+}
+
 export type UserData = {
   requisitionIds?: string[];
   account_links?: AccountLink[];
+  ynabTokens?: {
+    access_token: string;
+    access_expires: values.FaunaTime;
+    refresh_token: string;
+  };
 };
 
 export type UserDocument = FaunaDocument<UserData>;
@@ -114,6 +124,26 @@ export class User {
     return this.data.requisitionIds ?? [];
   }
 
+  public readonly getYnabTokens = async (): Promise<YnabTokens | undefined> => {
+    await this.load();
+    return this.data.ynabTokens ? {
+      ...this.data.ynabTokens,
+      access_expires: new Date((this.data.ynabTokens?.access_expires as values.FaunaTime & { value: string }).value),
+    } : undefined;
+  }
+
+  public readonly setYnabTokens = async (ynabTokens: YnabTokens): Promise<YnabTokens | undefined> => {
+    const updated = await this.client.query<UserDocument>(Update(this.ref, {
+      data: {
+        ynabTokens: {
+          ...ynabTokens,
+          access_expires: new values.FaunaTime(ynabTokens.access_expires),
+        }
+      }
+    }));
+    this.data = updated.data;
+    return this.getYnabTokens();
+  }
 }
 
 export const getUser = async (client: Client, userId: string) => new User(client, userId);

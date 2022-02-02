@@ -1,9 +1,7 @@
 import { Accordion, Box, Button, Heading, List, ListItem, useDisclosure, AccordionItem } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import { RequisitionData, Transaction } from '../lib/nordigen';
-import { Accounts } from "./Accounts";
 import { Requisition } from "./Requisition";
-import { Transactions } from "./Transactions";
 import { useRequisitions } from "../hooks/useRequisitions";
 import { BankSelector } from './BankSelector';
 import { IncomingMessage } from 'http';
@@ -45,7 +43,7 @@ export type NordigenProps = {
 };
 
 export const Nordigen = ({ onSelectTransactions }: NordigenProps) => {
-  const { requisitionIds, setRequisitionIds } = useRequisitions();
+  const { requisitionIds } = useRequisitions();
 
   const createRequisition = useCallback((institutionId: string) => {
     const redirectUrl = window.location.href.replace(/\?.*/, '');
@@ -58,9 +56,8 @@ export const Nordigen = ({ onSelectTransactions }: NordigenProps) => {
       return res.json();
     }).then((r: RequisitionData) => {
       window.location.href = r.link;
-      setRequisitionIds((requisitionIds ?? []).concat([r.id]))
     }).catch((e) => console.log("Error creating requisition", e))
-  }, [requisitionIds, setRequisitionIds]);
+  }, []);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 

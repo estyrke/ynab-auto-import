@@ -3,26 +3,20 @@ import { YnabTransaction } from '../pages/api/ynab/createTransactions';
 import { useCallback, useState } from 'react';
 
 type YnabTransactionsToImportProps = {
-  token?: string;
   budgetId?: string;
   accountId?: string;
   transactions: YnabTransaction[];
   transactionTooltips: string[];
 }
 
-export const YnabTransactionsToImport = ({ token, transactions, budgetId, accountId, transactionTooltips }: YnabTransactionsToImportProps) => {
+export const YnabTransactionsToImport = ({ transactions, budgetId, accountId, transactionTooltips }: YnabTransactionsToImportProps) => {
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
 
   const doImport = useCallback(() => {
-    if (!token) {
-      setError("Missing token");
-      return;
-    }
-
     setLoading(true);
     fetch(`api/ynab/createTransactions`, {
-      headers: { "Content-Type": "application/json", token },
+      headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify({ budgetId, accountId, transactions })
     })
@@ -33,7 +27,7 @@ export const YnabTransactionsToImport = ({ token, transactions, budgetId, accoun
         console.log(`Error importing to account ${accountId} of budget ${budgetId}`, e)
         setError(e);
       });
-  }, [token, budgetId, accountId, transactions])
+  }, [budgetId, accountId, transactions])
 
   if (!transactions)
     return <Text>Select some transactions to import...</Text>
@@ -50,7 +44,7 @@ export const YnabTransactionsToImport = ({ token, transactions, budgetId, accoun
           </Tooltip>))}
       </Tbody>
     </Table>
-    <Button disabled={isLoading || !budgetId || !accountId || !token} onClick={doImport}>{isLoading ? "Importing..." : "Import"}</Button>
+    <Button disabled={isLoading || !budgetId || !accountId} onClick={doImport}>{isLoading ? "Importing..." : "Import"}</Button>
     {error ? <Box>{JSON.stringify(error)}</Box> : undefined}
   </>;
 }

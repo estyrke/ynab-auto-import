@@ -2,14 +2,13 @@ import { Select } from "@chakra-ui/react";
 import { useYnabBudgets } from "../hooks/useYnabBudgets";
 
 type YnabBudgetListProps = {
-  token?: string;
   onBudgetSelected: (budgetId: string) => void;
 };
-export const YnabBudgetList = ({ token, onBudgetSelected }: YnabBudgetListProps) => {
-  const { budgets, error } = useYnabBudgets(token);
+export const YnabBudgetList = ({ onBudgetSelected }: YnabBudgetListProps) => {
+  const { budgets, error } = useYnabBudgets();
 
   console.log(budgets, error);
-  let defaultText = "--- Select a budget ---";
+  let defaultText = "--- default ---";
   if (error)
     defaultText = `--- ${JSON.stringify(error.info)} ---`;
   else if (!budgets)
@@ -19,7 +18,7 @@ export const YnabBudgetList = ({ token, onBudgetSelected }: YnabBudgetListProps)
     console.log("Selected budget", e.currentTarget.value);
     return onBudgetSelected(e.currentTarget.value);
   }}>
-    <option value="">{defaultText}</option>
+    <option value="default">{defaultText}</option>
     {budgets?.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
   </Select>;
 };
