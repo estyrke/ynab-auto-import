@@ -1,11 +1,11 @@
-import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiError } from '../../../lib/api.error';
 import { createClient, getUser } from '../../../lib/fauna';
 import { absoluteUrl, requestYnabTokens, YnabTokenData } from '../../../lib/ynab';
 
-export default requireSession(async (
-  req: WithSessionProp<NextApiRequest>,
+export default requireAuth(async (
+  req: RequireAuthProp<NextApiRequest>,
   res: NextApiResponse<void | ApiError>
 ) => {
   console.log("Authorize called", req.query);
@@ -28,11 +28,7 @@ export default requireSession(async (
 
   console.log("Ynab tokens", ynabTokens);
   const client = createClient();
-  if (!req.session?.userId) {
-    res.status(400).json({ error: "Missing userId" })
-    return;
-  }
-  const user = await getUser(client, req.session.userId);
+  const user = await getUser(client, req.auth.userId);
   await user.load();
   await user.setYnabTokens({
     access_token: ynabTokens.access_token,

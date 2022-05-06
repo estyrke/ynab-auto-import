@@ -1,8 +1,8 @@
 import { API } from "ynab";
-import { WithSessionProp } from '@clerk/nextjs/api';
 import { createClient, getUser, User } from './fauna';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingMessage } from "http";
+import { RequireAuthProp } from '@clerk/nextjs/api';
 
 export function absoluteUrl(
   req?: IncomingMessage,
@@ -124,17 +124,12 @@ export const getFreshYnabTokens = async (user: User, origin: string) => {
 };
 
 export const withYnabApi = <
-  Req extends WithSessionProp<NextApiRequest>,
+  Req extends RequireAuthProp<NextApiRequest>,
   Res extends NextApiResponse
->(handler: (req: WithSessionProp<Req>, res: Res, ynab: API) => Promise<void> | void) => {
-  return async (req: WithSessionProp<Req>, res: Res) => {
-    if (!req.session?.userId) {
-      res.status(400).json({ error: "Missing userId" })
-      return;
-    }
-
+>(handler: (req: RequireAuthProp<Req>, res: Res, ynab: API) => Promise<void> | void) => {
+  return async (req: RequireAuthProp<Req>, res: Res) => {
     const client = createClient();
-    const user = await getUser(client, req.session.userId);
+    const user = await getUser(client, req.auth.userId);
     const origin = absoluteUrl(req).origin;
 
     let ynabTokens;

@@ -1,4 +1,4 @@
-import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SaveTransaction } from 'ynab';
 import { ApiError } from '../../../lib/api.error';
@@ -12,8 +12,8 @@ export type YnabTransaction = {
   import_id: string;
 }
 
-export default requireSession(withYnabApi(async (
-  req: WithSessionProp<NextApiRequest>,
+export default requireAuth(withYnabApi(async (
+  req: RequireAuthProp<NextApiRequest>,
   res: NextApiResponse<void | ApiError>,
   ynab
 ) => {

@@ -1,11 +1,11 @@
-import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BudgetSummaryResponse } from 'ynab';
 import { ApiError } from '../../../lib/api.error';
 import { withYnabApi } from '../../../lib/ynab';
 
-export default requireSession(withYnabApi(async (
-  req: WithSessionProp<NextApiRequest>,
+export default requireAuth(withYnabApi(async (
+  req: RequireAuthProp<NextApiRequest>,
   res: NextApiResponse<BudgetSummaryResponse | ApiError>,
   ynab
 ) => {

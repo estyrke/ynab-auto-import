@@ -1,11 +1,11 @@
-import { requireSession, WithSessionProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { AccountDetails, getAccount } from '../../../lib/nordigen';
 import { createClient, getSession } from '../../../lib/fauna';
 
 
-export default requireSession(async (
-  req: WithSessionProp<NextApiRequest>,
+export default requireAuth(async (
+  req: RequireAuthProp<NextApiRequest>,
   res: NextApiResponse<AccountDetails>
 ) => {
   const client = createClient();

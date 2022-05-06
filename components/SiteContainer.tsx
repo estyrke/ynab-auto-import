@@ -22,7 +22,7 @@ export const SiteContainer = ({ children }: PropsWithChildren<{}>) => {
             <Link href="/"><Heading>Bank Import (Sweden) for YNAB</Heading></Link>
             <Spacer />
             <Link href="/import">Import</Link><Button onClick={toggleColorMode}>Switch theme</Button>
-            <UserButton />
+            <UserButton afterSignOutUrl="/" />
           </HStack>
           <VStack alignItems="flex-start" dropShadow="lg" borderRadius="md">
             {children}
