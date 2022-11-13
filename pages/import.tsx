@@ -28,7 +28,7 @@ const Import: NextPage = () => {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start" >
       <Nordigen onSelectTransactions={onSelectTransactions} />
     </VStack>
-    <VStack VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start" >
+    <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start" >
       <Ynab transactionsToImport={transactions} originalTransactions={originalTransactions} />
     </VStack>
   </SiteContainer>);

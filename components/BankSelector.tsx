@@ -51,7 +51,7 @@ export const BankSelector = (props: BankSelectorProps) => {
   const { data: institutions, error } = useSWRImmutable<InstitutionData[]>("api/institutions");
   const [filteredInstitutions, setFilteredInstitutions] = useState<InstitutionData[]>(institutions ?? []);
 
-  const setSearchFilter = useCallback((filter) => {
+  const setSearchFilter = useCallback((filter: string) => {
     console.log("filter", filter)
     if (!institutions) {
       setFilteredInstitutions([]);
