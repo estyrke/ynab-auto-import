@@ -126,8 +126,8 @@ export const getFreshYnabTokens = async (user: User, origin: string) => {
 export const withYnabApi = <
   Req extends RequireAuthProp<NextApiRequest>,
   Res extends NextApiResponse
->(handler: (req: RequireAuthProp<Req>, res: Res, ynab: API) => Promise<void> | void) => {
-  return async (req: RequireAuthProp<Req>, res: Res) => {
+>(handler: (req: Req, res: Res, ynab: API) => Promise<void> | void) => {
+  return async (req: Req, res: Res) => {
     const client = createClient();
     const user = await getUser(client, req.auth.userId);
     const origin = absoluteUrl(req).origin;
