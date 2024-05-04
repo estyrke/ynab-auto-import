@@ -22,7 +22,7 @@ export type Tokens = {
 const makeRequest = async <Res>(
   method: string,
   path: string,
-  body: any,
+  body?: any,
   session?: Session
 ) => {
   let tokens = undefined;
@@ -45,11 +45,11 @@ const makeRequest = async <Res>(
       Accept: "application/json",
       ...auth,
     },
-    body: body,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {
-    console.log(`problem with request: ${res.status}: ${res.text}`);
+    console.log(`problem with request: ${res.status}: ${res.text()}`);
     throw new Error(res.statusText);
   }
 
@@ -61,8 +61,9 @@ const post = async <Res>(
   body: any,
   session?: Session
 ): Promise<Res> => makeRequest("POST", path, body, session);
+
 const get = async <Res>(path: string, session?: Session): Promise<Res> =>
-  makeRequest("GET", path, "", session);
+  makeRequest("GET", path, undefined, session);
 
 export const getTokens = async (): Promise<Tokens> => {
   console.log("Fetching new tokens...");
