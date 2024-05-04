@@ -36,7 +36,7 @@ const makeRequest = async <Res>(method: string, path: string, body: any, session
     const auth = tokens?.access ? { 'Authorization': `Bearer ${tokens.access}` } : {};
 
     const nreq = request({
-      method, host: "ob.nordigen.com", path, headers: {
+      method, host: "bankaccountdata.gocardless.com", path, headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData),
         ...auth
