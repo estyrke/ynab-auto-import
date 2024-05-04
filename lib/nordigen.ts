@@ -49,7 +49,7 @@ const makeRequest = async <Res>(
   });
 
   if (!res.ok) {
-    console.log(`problem with request: ${res.status}: ${res.text()}`);
+    console.log(`problem with request: ${res.status}: ${await res.text()}`);
     throw new Error(res.statusText);
   }
 
@@ -87,6 +87,16 @@ export const refreshTokens = async (tokens: Tokens): Promise<Tokens> => {
     access: access_token.access,
     access_expires: new Date(Date.now() + access_token.access_expires),
   }));
+};
+
+export type AgreementData = {
+  id: string;
+  created: string;
+  max_historical_days: number;
+  access_valid_for_days: number;
+  access_scope: string[];
+  accepted: string;
+  institution_id: string;
 };
 
 export type RequisitionData = {
@@ -171,15 +181,28 @@ export type CreateRequisitionOptions = {
 export const createRequisition = async (
   { redirectUrl, institutionId }: CreateRequisitionOptions,
   session: Session
-) =>
-  post<RequisitionData>(
+) => {
+  const agreement = post<AgreementData>(
+    "/api/v2/agreements/enduser/",
+    {
+      institution_id: institutionId,
+      max_historical_days: 180,
+      access_valid_for_days: 180,
+      access_scope: ["balances", "details", "transactions"],
+    },
+    session
+  );
+
+  return post<RequisitionData>(
     "/api/v2/requisitions/",
     {
       redirect: redirectUrl,
       institution_id: institutionId,
+      agreement: (await agreement).id,
     },
     session
   );
+};
 
 export const deleteRequisition = async (id: string, session: Session) =>
   makeRequest<void>(
