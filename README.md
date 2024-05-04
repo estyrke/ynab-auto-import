@@ -1,4 +1,4 @@
-This is a service using the [Nordigen](https://nordigen.com/) API to fetch bank transactions and then importing them into [YNAB](https://www.youneedabudget.com/).
+This is a service using the [Gocardless (formerly Nordigen)](https://gocardless.com/) API to fetch bank transactions and then importing them into [YNAB](https://www.youneedabudget.com/).
 
 ## Getting Started
 
