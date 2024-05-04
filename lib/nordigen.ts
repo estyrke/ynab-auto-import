@@ -1,4 +1,3 @@
-import { request } from "https";
 import { Session } from "./fauna";
 
 type TokenResponse = {
@@ -25,63 +24,38 @@ const makeRequest = async <Res>(
   path: string,
   body: any,
   session?: Session
-) =>
-  new Promise<Res>(async (resolve, reject) => {
-    let tokens = undefined;
-    if (session) {
-      tokens = await session.getTokens();
-      if (!tokens?.refresh_expires || tokens.refresh_expires < new Date()) {
-        tokens = await session.updateTokens(await getTokens());
-      } else if (!tokens.access_expires || tokens.access_expires < new Date()) {
-        tokens = await session.updateTokens(await refreshTokens(tokens));
-      }
+) => {
+  let tokens = undefined;
+  if (session) {
+    tokens = await session.getTokens();
+    if (!tokens?.refresh_expires || tokens.refresh_expires < new Date()) {
+      tokens = await session.updateTokens(await getTokens());
+    } else if (!tokens.access_expires || tokens.access_expires < new Date()) {
+      tokens = await session.updateTokens(await refreshTokens(tokens));
     }
-    const postData = body !== undefined ? JSON.stringify(body) : "";
-    const auth = tokens?.access
-      ? { Authorization: `Bearer ${tokens.access}` }
-      : {};
+  }
+  const postData = body !== undefined ? JSON.stringify(body) : "";
+  const auth: { [key: string]: string } = tokens?.access
+    ? { Authorization: `Bearer ${tokens.access}` }
+    : {};
 
-    const nreq = request(
-      {
-        method,
-        host: "bankaccountdata.gocardless.com",
-        path,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "Content-Length": Buffer.byteLength(postData),
-          ...auth,
-        },
-      },
-      (nres) => {
-        nres.setEncoding("utf8");
-        let ndata = "";
-        nres.on("data", (chunk) => {
-          ndata += chunk;
-        });
-        nres.on("end", () => {
-          if (
-            nres.statusCode &&
-            nres.statusCode >= 200 &&
-            nres.statusCode < 300
-          ) {
-            resolve(JSON.parse(ndata));
-          } else {
-            reject(JSON.parse(ndata));
-          }
-        });
-      }
-    );
-
-    nreq.on("error", (e) => {
-      console.log(`problem with request: ${e.message}`);
-      reject(e);
-    });
-
-    // write data to request body
-    nreq.write(postData);
-    nreq.end();
+  const res = await fetch(`https://bankaccountdata.gocardless.com${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "Content-Length": Buffer.byteLength(postData).toString(),
+      ...auth,
+    },
   });
+
+  if (!res.ok) {
+    console.log(`problem with request: ${res.status}: ${res.text}`);
+    throw new Error(res.statusText);
+  }
+
+  return res.json() as Promise<Res>;
+};
 
 const post = async <Res>(
   path: string,
