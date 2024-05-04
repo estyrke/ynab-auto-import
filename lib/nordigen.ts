@@ -34,7 +34,6 @@ const makeRequest = async <Res>(
       tokens = await session.updateTokens(await refreshTokens(tokens));
     }
   }
-  const postData = body !== undefined ? JSON.stringify(body) : "";
   const auth: { [key: string]: string } = tokens?.access
     ? { Authorization: `Bearer ${tokens.access}` }
     : {};
@@ -44,9 +43,9 @@ const makeRequest = async <Res>(
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "Content-Length": Buffer.byteLength(postData).toString(),
       ...auth,
     },
+    body: body,
   });
 
   if (!res.ok) {
