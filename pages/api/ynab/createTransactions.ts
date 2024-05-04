@@ -1,6 +1,6 @@
-import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { SaveTransaction } from 'ynab';
+import { TransactionClearedStatus } from 'ynab';
 import { ApiError } from '../../../lib/api.error';
 import { withYnabApi } from '../../../lib/ynab';
 
@@ -42,7 +42,7 @@ export default requireAuth(withYnabApi(async (
       transactions: transactions.map((t) => ({
         ...t,
         account_id: accountId,
-        cleared: SaveTransaction.ClearedEnum.Cleared
+        cleared: TransactionClearedStatus.Cleared
       }))
     });
 

@@ -1,4 +1,4 @@
-import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getRequisition, RequisitionData, deleteRequisition } from '../../../lib/nordigen';
 import { createClient, getSession, getUser } from '../../../lib/fauna';

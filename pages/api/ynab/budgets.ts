@@ -1,4 +1,4 @@
-import { requireAuth, RequireAuthProp } from '@clerk/nextjs/api';
+import { requireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BudgetSummaryResponse } from 'ynab';
 import { ApiError } from '../../../lib/api.error';

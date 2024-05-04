@@ -8,30 +8,31 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.19",
-    "@chakra-ui/react": "^2.7.1",
-    "@clerk/nextjs": "^4.21.15",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "cookie": "^0.5.0",
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@clerk/clerk-sdk-node": "^5.0.3",
+    "@clerk/nextjs": "^5.0.6",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "cookie": "^0.6.0",
     "faunadb": "^4.8.0",
-    "formik": "^2.4.2",
+    "formik": "^2.4.6",
     "formik-chakra-ui": "^1.6.1",
-    "framer-motion": "^10.12.18",
-    "next": "13.4.9",
+    "framer-motion": "^11.1.7",
+    "next": "14.2.3",
     "node-jose": "^2.2.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "swr": "^2.2.0",
-    "ynab": "^1.55.0"
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "swr": "^2.2.5",
+    "ynab": "^2.2.0"
   },
   "devDependencies": {
-    "@types/cookie": "^0.5.1",
-    "@types/node": "20.4.1",
-    "@types/node-jose": "^1.1.10",
-    "@types/react": "18.2.14",
-    "eslint": "8.44.0",
-    "eslint-config-next": "13.4.9",
-    "typescript": "5.1.6"
+    "@types/cookie": "^0.6.0",
+    "@types/node": "20.12.8",
+    "@types/node-jose": "^1.1.13",
+    "@types/react": "18.3.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "typescript": "5.4.5"
   }
 }

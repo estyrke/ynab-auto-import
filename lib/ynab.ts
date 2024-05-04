@@ -2,7 +2,7 @@ import { API } from "ynab";
 import { createClient, getUser, User } from './fauna';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingMessage } from "http";
-import { RequireAuthProp } from '@clerk/nextjs/api';
+import { RequireAuthProp } from '@clerk/clerk-sdk-node';
 
 export function absoluteUrl(
   req?: IncomingMessage,
